@@ -28,7 +28,7 @@ async function signUpController(req, res) {
     const UserModel = new userModel({ userName, email, password });
     UserModel.password = await bcrypt.hash(password, 10);
     const jwtToken = await jwt.sign(
-      { userId: UserModel._id, email: UserModel.email },
+      { _id: UserModel._id, email: UserModel.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
@@ -83,7 +83,7 @@ async function loginController(req, res) {
   }
 
     const jwtToken = await jwt.sign(
-      { userId: isUserExists._id, email: isUserExists.email },
+      { _id: isUserExists._id, email: isUserExists.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
@@ -106,7 +106,16 @@ async function loginController(req, res) {
     });
   }
 }
+  
 
+/**
+ *
+ * @name  logoutController
+ * @description logout expect token in the request header and add that token to blacklist collection and clear cookie
+ * @route POST /api/auth/logout
+ * @access Public
+ *
+ */
 
 async function logOutController (req, res) {
   try {
@@ -128,7 +137,49 @@ async function logOutController (req, res) {
     })
   }
 }
+
+
+
+/**
+ *
+ * @name  tokenController
+ * @description get user details of logged in user
+ * @route GET /api/auth/get-me
+ * @access Public
+ *
+ */
+
+async function tokenController (req,res) {
+  try {
+     
+     const user = await userModel.findById(req.user._id);
+      if(!user){
+        return res.status(404).json({
+          message:"User not found",
+          success:false,
+          error:"User does not exist in database"
+        })
+      }
+      res.status(200).json({
+        message:"User details fetched successfully",
+        success:true,
+        email: user.email,
+        userName: user.userName,
+        _id:user._id,
+      })
+    }
+        catch (error) {
+      console.log("tokenController error:", error)
+      res.status(500).json({
+        message:"Internal server Problem",
+        success:false,
+        error:error.message
+      })
+  }
+   
+}
+
 module.exports = {
-  signUpController, loginController,
+  signUpController, loginController, tokenController,
   logOutController
 };

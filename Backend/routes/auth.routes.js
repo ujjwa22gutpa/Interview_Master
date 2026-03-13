@@ -1,6 +1,6 @@
 const Router = require('express').Router();
-const { signUpController, loginController, logOutController }  = require('../controllers/authController')
-const {signUpValidation, loginValidation} = require('../middlewares/authMiddlware')
+const { signUpController, loginController, logOutController, tokenController }  = require('../controllers/authController')
+const {signUpValidation, loginValidation, tokenValidation} = require('../middlewares/authMiddlware')
 
 /**
  * @route POST /api/auth/signup
@@ -28,5 +28,12 @@ Router.post('/login', loginValidation, loginController)
 
 Router.get('/logout', logOutController )
 
+/**
+ * @route get /api/auth/get-me
+ * @description get user details of logged in user
+ * @access Public
+ */
+
+Router.get('/get-me', tokenValidation, tokenController)
 
 module.exports = Router;
