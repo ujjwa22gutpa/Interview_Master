@@ -1,15 +1,15 @@
-import React from "react";
-import "../auth.form.scss"
+import React from 'react'
 import {useNavigate} from 'react-router'
 import {Link} from 'react-router'
-import { useState } from "react";
-
-export default function Login() {
-    const [user,setUser] = useState({
-        email:"",
-        password:""
-    })
-    function handleSubmit(e){
+import { useState} from 'react'
+export default function Register() {
+  const [user, setUser] = useState({
+    name:"",
+    email:"",
+    password:""
+  })
+    const navigate = useNavigate();
+      function handleSubmit(e){
         e.preventDefault();
     }
     function handleChange(e){
@@ -23,9 +23,24 @@ export default function Login() {
     <>
       <main>
         <div className="form-contain">
-          <h2>Login Page</h2>
+          <h2>Register</h2>
           <form onSubmit={handleSubmit}>
             <div className="input-group">
+              <label htmlFor="name">
+                UserName
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={user.name}
+                  placeholder="Enter username"
+                  autoFocus
+                  required
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+             <div className="input-group">
               <label htmlFor="email">
                 Email
                 <input
@@ -34,7 +49,6 @@ export default function Login() {
                   name="email"
                   value={user.email}
                   placeholder="Enter email address"
-                  autoFocus
                   required
                   onChange={handleChange}
                 />
@@ -54,10 +68,10 @@ export default function Login() {
                 />
               </label>
             </div>
-            <button className="button primary-button danger-button  ">Login</button>
+            <button className="button primary-button danger-button  ">Register</button>
           </form>
-          <span>Don't have an account? 
-                 <Link to="/register"> Register</Link>
+          <span>Already have an account? 
+                 <Link to="/login"> Login</Link>
                </span>
         </div>
       </main>
