@@ -1,8 +1,8 @@
 const userModel = require("../model/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const cookie = require("cookie-parser")
-const blackListModel = require('../model/blacklist.Model')
+const cookie = require("cookie-parser");
+const blackListModel = require("../model/blacklist.Model");
 
 /**
  *
@@ -32,14 +32,16 @@ async function signUpController(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
-    res.cookie('token',jwtToken);
+    res.cookie("token", jwtToken);
     await UserModel.save();
     res.status(200).json({
       message: "user registered successfully",
       success: true,
-      email: UserModel.email,
-      userName: UserModel.userName,
-      _id:UserModel._id,
+      user: {
+        email: UserModel.email,
+        userName: UserModel.userName,
+        _id: UserModel._id,
+      },
       jwtToken,
     });
   } catch (error) {
@@ -62,11 +64,10 @@ async function signUpController(req, res) {
  *
  */
 
-
 async function loginController(req, res) {
   try {
-    const {email, password } = req.body;
-    const isUserExists = await userModel.findOne( { email });
+    const { email, password } = req.body;
+    const isUserExists = await userModel.findOne({ email });
 
     if (!isUserExists) {
       return res.status(400).json({
@@ -74,13 +75,13 @@ async function loginController(req, res) {
         success: false,
       });
     }
-  const isPassValid = await bcrypt.compare(password, isUserExists.password);
-  if(!isPassValid){
-     return res.status(400).json({
+    const isPassValid = await bcrypt.compare(password, isUserExists.password);
+    if (!isPassValid) {
+      return res.status(400).json({
         message: "Invalid Credentials",
         success: false,
       });
-  }
+    }
 
     const jwtToken = await jwt.sign(
       { _id: isUserExists._id, email: isUserExists.email },
@@ -88,17 +89,18 @@ async function loginController(req, res) {
       { expiresIn: "1d" },
     );
 
-    res.cookie('token',jwtToken);
+    res.cookie("token", jwtToken);
     res.status(200).json({
       message: "User LoggedIn successfully",
       success: true,
-      email: isUserExists.email,
-      userName: isUserExists.userName,
-      _id:isUserExists._id,
+      user: {
+        email: isUserExists.email,
+        userName: isUserExists.userName,
+        _id: isUserExists._id,
+      },
       jwtToken,
     });
   } catch (error) {
-  
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,
@@ -106,7 +108,6 @@ async function loginController(req, res) {
     });
   }
 }
-  
 
 /**
  *
@@ -117,28 +118,26 @@ async function loginController(req, res) {
  *
  */
 
-async function logOutController (req, res) {
+async function logOutController(req, res) {
   try {
-     const token  = req.cookies.token;
-    if(token){
-        await blackListModel.create({token});
+    const token = req.cookies.token;
+    if (token) {
+      await blackListModel.create({ token });
     }
     res.clearCookie("token");
     res.status(200).json({
-      message:"User logged out successfully",
-      success:true
-    })
+      message: "User logged out successfully",
+      success: true,
+    });
   } catch (error) {
-    console.log("----->>>>",error)
+    console.log("----->>>>", error);
     res.status(500).json({
-        message:"Internal server Problem",
-        success:false,
-        error:error.message
-    })
+      message: "Internal server Problem",
+      success: false,
+      error: error.message,
+    });
   }
 }
-
-
 
 /**
  *
@@ -149,37 +148,36 @@ async function logOutController (req, res) {
  *
  */
 
-async function tokenController (req,res) {
+async function tokenController(req, res) {
   try {
-     
-     const user = await userModel.findById(req.user._id);
-      if(!user){
-        return res.status(404).json({
-          message:"User not found",
-          success:false,
-          error:"User does not exist in database"
-        })
-      }
-      res.status(200).json({
-        message:"User details fetched successfully",
-        success:true,
-        email: user.email,
-        userName: user.userName,
-        _id:user._id,
-      })
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+        error: "User does not exist in database",
+      });
     }
-        catch (error) {
-      console.log("tokenController error:", error)
-      res.status(500).json({
-        message:"Internal server Problem",
-        success:false,
-        error:error.message
-      })
+    res.status(200).json({
+      message: "User details fetched successfully",
+      success: true,
+      email: user.email,
+      userName: user.userName,
+      _id: user._id,
+    });
+  } catch (error) {
+    console.log("tokenController error:", error);
+    res.status(500).json({
+      message: "Internal server Problem",
+      success: false,
+      error: error.message,
+    });
   }
-   
 }
 
 module.exports = {
-  signUpController, loginController, tokenController,
-  logOutController
+  signUpController,
+  loginController,
+  tokenController,
+  logOutController,
 };
