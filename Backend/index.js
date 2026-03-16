@@ -4,7 +4,8 @@ const express = require("express");
 const MongoDBConnection= require('./model/DBModel')
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
-const invokeGeminiAi = require("./services/ai.service")
+const { generateInterviewReport, invokeGeminiAi } = require("./services/ai.service")
+const { resume, jobDescription, selfDescription } = require("./services/temp")
 
 /* require all the routes here */
 const authRoute = require("./routes/auth.routes")
@@ -15,7 +16,8 @@ const PORT = process.env.PORT || 3000;
 MongoDBConnection()
 app.use(cookieParser())
 app.use(express.json());
-invokeGeminiAi()
+generateInterviewReport({resume, jobDescription, selfDescription})
+//invokeGeminiAi()
 
  app.use(cors( {
     origin: process.env.FRONTEND_URL,
