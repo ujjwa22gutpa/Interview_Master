@@ -9,7 +9,7 @@ const {signUpValidation, loginValidation, tokenValidation} = require('../middlew
  */
 
 
-Router.post('/signup', signUpValidation, signUpController);
+Router.post('/register', signUpValidation, signUpController);
 
 /**
  * @route POST /api/auth/login

@@ -161,9 +161,11 @@ async function tokenController(req, res) {
     res.status(200).json({
       message: "User details fetched successfully",
       success: true,
-      email: user.email,
-      userName: user.userName,
-      _id: user._id,
+      user: {
+        email: user.email,
+        userName: user.userName,
+        _id: user._id,
+      }
     });
   } catch (error) {
     console.log("tokenController error:", error);

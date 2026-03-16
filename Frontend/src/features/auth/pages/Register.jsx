@@ -2,15 +2,19 @@ import React from 'react'
 import {useNavigate} from 'react-router'
 import {Link} from 'react-router'
 import { useState} from 'react'
+import {useAuth} from '../hooks/useAuth'
 export default function Register() {
+  const navigate = useNavigate();
+  const {loading, handleRegister} = useAuth();
   const [user, setUser] = useState({
     name:"",
     email:"",
     password:""
   })
-    const navigate = useNavigate();
-      function handleSubmit(e){
+     async function handleSubmit(e){
         e.preventDefault();
+        await handleRegister({userName: user.name, email: user.email, password: user.password});
+        navigate("/");
     }
     function handleChange(e){
         const {name, value} = e.target; 
@@ -19,6 +23,7 @@ export default function Register() {
            [name]: value 
         }))
     }
+    if(loading) return <main> <h2>Loading...</h2></main>;
   return (
     <>
       <main>

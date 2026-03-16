@@ -1,24 +1,35 @@
-import React from "react";
 import "../auth.form.scss"
-import {useNavigate} from 'react-router'
-import {Link} from 'react-router'
-import { useState } from "react";
-
+import {Link, useNavigate} from 'react-router'
+import { useState } from "react"; 
+import {useAuth} from '../hooks/useAuth'
+ 
 export default function Login() {
+  const navigate = useNavigate()
+  const {loading, handleLogin} = useAuth();
+  
     const [user,setUser] = useState({
         email:"",
         password:""
     })
-    function handleSubmit(e){
-        e.preventDefault();
-    }
+
     function handleChange(e){
         const {name, value} = e.target; 
         setUser((prevUser) => ({
            ...prevUser,
-           [name]: value 
+           [name]: value  // Two way binding for form inputs
         }))
     }
+
+   async function handleSubmit(e){
+        e.preventDefault();
+        await handleLogin({email: user.email, password: user.password});
+       navigate("/");
+
+    }
+    
+    if(loading) return <main> <h2>Loading...</h2></main>;
+
+
   return (
     <>
       <main>
@@ -35,6 +46,7 @@ export default function Login() {
                   value={user.email}
                   placeholder="Enter email address"
                   autoFocus
+                  autoComplete="off"
                   required
                   onChange={handleChange}
                 />
@@ -49,6 +61,7 @@ export default function Login() {
                   name="password"
                   value={user.password}
                   placeholder="Enter the password"
+                  autoComplete="off"
                   required
                   onChange={handleChange}
                 />
